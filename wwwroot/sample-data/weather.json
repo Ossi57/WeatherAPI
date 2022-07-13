@@ -1,0 +1,27 @@
+﻿[
+  {
+    "date": "2022-03-09",
+    "temperatureC": 1,
+    "summary": "Freezing"
+  },
+  {
+    "date": "2022-03-10",
+    "temperatureC": 14,
+    "summary": "Bracing"
+  },
+  {
+    "date": "2022-03-11",
+    "temperatureC": -13,
+    "summary": "Freezing"
+  },
+  {
+    "date": "2022-03-12",
+    "temperatureC": -16,
+    "summary": "Balmy"
+  },
+  {
+    "date": "2022-03-13",
+    "temperatureC": -2,
+    "summary": "Chilly"
+  }
+]

@@ -1,0 +1,331 @@
+﻿@inject HttpClient Http
+@inject IJSRuntime theJavaScriptEngine
+
+@if (forecasts == null)
+{
+    <p><em>Retrieving Weather-Data for your current location...</em></p>
+}
+else
+{
+    <MudGrid Style="float:left">
+        <MudItem>
+            <MudText Typo="Typo.h5">Weather Data for: </MudText>
+        </MudItem>
+        <MudItem>
+            <MudTextField @bind-Value="@Location" Label="Location" Variant="Variant.Text" />
+        </MudItem>
+        <MudItem>
+            <MudButton Variant="Variant.Filled" OnClick="RetrieveCoorByName" Color="Color.Primary">Search</MudButton>
+        </MudItem>
+        <MudItem>
+            <LeafletMapComponent @ref="LeafletMapComponent" Lat="@Coor.Lat" Lon="@Coor.Lon"></LeafletMapComponent>
+        </MudItem>
+    </MudGrid>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Current Temp. (°C)</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in forecasts.Daily)
+            {
+                <tr>
+                    <td>@UnixTimeStampToDateTime(forecast.Dt).ToString("dd.MM.yyyy")</td>
+                    <td>@Math.Round(forecast.Temp.Day)</td>
+                    <td>@forecast.Weather.FirstOrDefault().Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    private WeatherForecast forecasts;
+    private CurrentLocation GeolocationResult { get; set; }
+    private string Location { get; set; }
+    private AddressCoor Coor { get; set; }
+    private LeafletMapComponent LeafletMapComponent;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GeolocationResult = await theJavaScriptEngine.InvokeAsync<CurrentLocation>("getLocation");
+        Coor = new AddressCoor()
+        {
+            Lat = GeolocationResult.latitute.ToString().Replace(',', '.'),
+            Lon = GeolocationResult.longitude.ToString().Replace(',', '.')
+        };
+        await GetWeatherDetails();
+    }
+
+    public async Task RetrieveCoorByName()
+    {
+        Coor = (await Http.GetFromJsonAsync<List<AddressCoor>>($"https://nominatim.openstreetmap.org/search" +
+        $"?city={Location}" +
+        $"&format=json")).FirstOrDefault();
+
+        await GetWeatherDetails();
+        StateHasChanged();
+        await LeafletMapComponent.Refresh();
+    }
+
+    private async Task GetWeatherDetails()
+    {
+        Location = (await Http.GetFromJsonAsync<AddressData>("https://nominatim.openstreetmap.org/reverse" +
+            $"?lat={Coor.Lat}" +
+                $"&lon={Coor.Lon}" +
+                    $"&format=json")).Address.Province;
+
+        forecasts = await Http.GetFromJsonAsync<WeatherForecast>($"https://api.openweathermap.org/data/2.5/onecall" +
+            $"?lat={Coor.Lat}" +
+                $"&lon={Coor.Lon}" +
+                    $"&units=metric" +
+                        $"&appid=dbf64f58c8e7b7bc342c369d8dbb7682" +
+                            $"&exclude=current,minutely,hourly,alerts");
+    }
+
+    public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
+    {
+        DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+        dateTime = dateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+        return dateTime;
+    }
+
+    public class CurrentLocation
+    {
+        public double latitute { get; set; }
+        public double longitude { get; set; }
+    }
+
+    public class Temp
+    {
+        [JsonProperty("day")]
+        public double Day { get; set; }
+
+        [JsonProperty("min")]
+        public double Min { get; set; }
+
+        [JsonProperty("max")]
+        public double Max { get; set; }
+
+        [JsonProperty("night")]
+        public double Night { get; set; }
+
+        [JsonProperty("eve")]
+        public double Eve { get; set; }
+
+        [JsonProperty("morn")]
+        public double Morn { get; set; }
+    }
+
+    public class FeelsLike
+    {
+        [JsonProperty("day")]
+        public double Day { get; set; }
+
+        [JsonProperty("night")]
+        public double Night { get; set; }
+
+        [JsonProperty("eve")]
+        public double Eve { get; set; }
+
+        [JsonProperty("morn")]
+        public double Morn { get; set; }
+    }
+
+    public class Weather
+    {
+        [JsonProperty("id")]
+        public int Id { get; set; }
+
+        [JsonProperty("main")]
+        public string Main { get; set; }
+
+        [JsonProperty("description")]
+        public string Description { get; set; }
+
+        [JsonProperty("icon")]
+        public string Icon { get; set; }
+    }
+
+    public class Daily
+    {
+        [JsonProperty("dt")]
+        public int Dt { get; set; }
+
+        [JsonProperty("sunrise")]
+        public int Sunrise { get; set; }
+
+        [JsonProperty("sunset")]
+        public int Sunset { get; set; }
+
+        [JsonProperty("moonrise")]
+        public int Moonrise { get; set; }
+
+        [JsonProperty("moonset")]
+        public int Moonset { get; set; }
+
+        [JsonProperty("moon_phase")]
+        public double MoonPhase { get; set; }
+
+        [JsonProperty("temp")]
+        public Temp Temp { get; set; }
+
+        [JsonProperty("feels_like")]
+        public FeelsLike FeelsLike { get; set; }
+
+        [JsonProperty("pressure")]
+        public int Pressure { get; set; }
+
+        [JsonProperty("humidity")]
+        public int Humidity { get; set; }
+
+        [JsonProperty("dew_point")]
+        public double DewPoint { get; set; }
+
+        [JsonProperty("wind_speed")]
+        public double WindSpeed { get; set; }
+
+        [JsonProperty("wind_deg")]
+        public int WindDeg { get; set; }
+
+        [JsonProperty("wind_gust")]
+        public double WindGust { get; set; }
+
+        [JsonProperty("weather")]
+        public List<Weather> Weather { get; set; }
+
+        [JsonProperty("clouds")]
+        public int Clouds { get; set; }
+
+        [JsonProperty("pop")]
+        public double Pop { get; set; }
+
+        [JsonProperty("snow")]
+        public double Snow { get; set; }
+
+        [JsonProperty("uvi")]
+        public double Uvi { get; set; }
+
+        [JsonProperty("rain")]
+        public double? Rain { get; set; }
+    }
+
+    public class WeatherForecast
+    {
+        [JsonProperty("lat")]
+        public double Lat { get; set; }
+
+        [JsonProperty("lon")]
+        public double Lon { get; set; }
+
+        [JsonProperty("timezone")]
+        public string Timezone { get; set; }
+
+        [JsonProperty("timezone_offset")]
+        public int TimezoneOffset { get; set; }
+
+        [JsonProperty("daily")]
+        public List<Daily> Daily { get; set; }
+    }
+
+    public class Address
+    {
+        [JsonProperty("tourism")]
+        public string Tourism { get; set; }
+
+        [JsonProperty("road")]
+        public string Road { get; set; }
+
+        [JsonProperty("suburb")]
+        public string Suburb { get; set; }
+
+        [JsonProperty("town")]
+        public string Town { get; set; }
+
+        [JsonProperty("province")]
+        public string Province { get; set; }
+
+        [JsonProperty("region")]
+        public string Region { get; set; }
+
+        [JsonProperty("postcode")]
+        public string Postcode { get; set; }
+
+        [JsonProperty("country")]
+        public string Country { get; set; }
+
+        [JsonProperty("country_code")]
+        public string CountryCode { get; set; }
+    }
+
+    public class AddressData
+    {
+        [JsonProperty("place_id")]
+        public int PlaceId { get; set; }
+
+        [JsonProperty("licence")]
+        public string Licence { get; set; }
+
+        [JsonProperty("osm_type")]
+        public string OsmType { get; set; }
+
+        [JsonProperty("osm_id")]
+        public long OsmId { get; set; }
+
+        [JsonProperty("lat")]
+        public string Lat { get; set; }
+
+        [JsonProperty("lon")]
+        public string Lon { get; set; }
+
+        [JsonProperty("display_name")]
+        public string DisplayName { get; set; }
+
+        [JsonProperty("address")]
+        public Address Address { get; set; }
+
+        [JsonProperty("boundingbox")]
+        public List<string> Boundingbox { get; set; }
+    }
+
+    public class AddressCoor
+    {
+        [JsonProperty("place_id")]
+        public int PlaceId { get; set; }
+
+        [JsonProperty("licence")]
+        public string Licence { get; set; }
+
+        [JsonProperty("osm_type")]
+        public string OsmType { get; set; }
+
+        [JsonProperty("osm_id")]
+        public object OsmId { get; set; }
+
+        [JsonProperty("boundingbox")]
+        public List<string> Boundingbox { get; set; }
+
+        [JsonProperty("lat")]
+        public string Lat { get; set; }
+
+        [JsonProperty("lon")]
+        public string Lon { get; set; }
+
+        [JsonProperty("display_name")]
+        public string DisplayName { get; set; }
+
+        [JsonProperty("class")]
+        public string Class { get; set; }
+
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("importance")]
+        public double Importance { get; set; }
+
+        [JsonProperty("icon")]
+        public string Icon { get; set; }
+    }
+}

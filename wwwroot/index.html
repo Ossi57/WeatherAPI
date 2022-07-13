@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>WeatherAPI</title>
+    <base href="/" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+    <script src="leaflet.js"></script>
+    <script src="currentLocation.js"></script>
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/app.css" rel="stylesheet" />
+    <link href="WeatherAPI.styles.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <script src="Location.js"></script>
+</head>
+
+<body>
+    <!--<weather-component></weather-component>
+        <div id="weather-component"></div>
+    <button onclick="loadWebComponent()">Test</button>-->
+
+    <div id="app">Loading...</div>
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <!--<script src="_content/Microsoft.AspNetCore.Components.CustomElements/BlazorCustomElements.js"></script>-->
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+
+
+    <!--<script>window.loadApp = function (component, params) {
+                let containerElement = document.querySelector('#app')
+                window.Blazor.rootComponents.add(containerElement, component, params)
+            }
+            window.loadWebComponent = function (component, params) {
+            let containerElement = document.querySelector("#weather-component");
+            window.Blazor.rootComponents.add(containerElement, component, params)
+            }
+            </script>
+            -->
+</body>
+
+</html>

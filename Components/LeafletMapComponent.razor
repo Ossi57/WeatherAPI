@@ -1,0 +1,25 @@
+﻿@inject IJSRuntime theJavascriptEngine
+
+<div id="map" style="width: 600px; height: 400px"></div>
+<br />
+@code{
+    [Parameter]
+    public string Lat { get; set; }
+
+    [Parameter]
+    public string Lon { get; set; }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Refresh();
+        }
+    }
+
+    public async Task Refresh()
+    {
+        await theJavascriptEngine.InvokeVoidAsync("setSelection", Lat, Lon);
+    }
+}
