@@ -2,8 +2,8 @@
 Thesis - User Story 2: WeatherAPI 
 
 ## How to run the application
-Open the "WeatherAPI.sln" file.
-Run the application in debug / release mode.
+- Open the "WeatherAPI.sln" file.
+- Run the application in debug / release mode.
 
 <img width="389" alt="image" src="https://user-images.githubusercontent.com/32513546/180615635-c07f7129-7c93-45fb-987a-0365fe0fc84f.png">
 
