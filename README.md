@@ -4,7 +4,7 @@ Thesis - User Story 2: WeatherAPI
 ## How to run the application
 Open the "WeatherAPI.sln" file.
 Run the application in debug / release mode.
-<img width="388" alt="image" src="https://user-images.githubusercontent.com/32513546/180615635-c07f7129-7c93-45fb-987a-0365fe0fc84f.png">
+<img width="389" alt="image" src="https://user-images.githubusercontent.com/32513546/180615635-c07f7129-7c93-45fb-987a-0365fe0fc84f.png">
 
 ## How to use WeatherAPI
 When calling the weather page, a weather forecast for the current location will be displayed.
